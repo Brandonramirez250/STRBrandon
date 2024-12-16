@@ -14,8 +14,8 @@ document.addEventListener("DOMContentLoaded", function() {
       .then(response => response.json())  // Convertir la respuesta en un objeto JSON
       .then(fetchedData => {
         data = fetchedData;
-        // Mostrar los datos al cargar
-        displayData([]);
+        // Mostrar todos los datos al cargar, sin filtro
+        displayData(data);
       })
       .catch(error => console.error('Error al cargar el archivo JSON:', error));
 
