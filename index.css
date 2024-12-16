@@ -63,41 +63,31 @@
   
   #dataContainer {
     margin-top: 30px;
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-    gap: 20px;
+    width: 100%;
+    overflow-x: auto;
   }
   
-  .card {
+  table {
+    width: 100%;
+    border-collapse: collapse;
+  }
+  
+  table, th, td {
+    border: 1px solid #ddd;
+  }
+  
+  th, td {
+    padding: 12px;
+    text-align: left;
+  }
+  
+  th {
+    background-color: #3498db;
+    color: white;
+  }
+  
+  td {
     background-color: #ecf0f1;
-    padding: 20px;
-    border-radius: 8px;
-    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    transition: transform 0.3s ease, box-shadow 0.3s ease;
-  }
-  
-  .card:hover {
-    transform: translateY(-5px);
-    box-shadow: 0 8px 15px rgba(0, 0, 0, 0.1);
-  }
-  
-  .card .mac, .card .sn {
-    font-weight: bold;
-    color: #34495e;
-  }
-  
-  .card .activo {
-    color: #27ae60;
-    font-weight: bold;
-  }
-  
-  #noResultsMessage {
-    text-align: center;
-    font-size: 1.2em;
-    color: #777;
   }
   
   .pagination {

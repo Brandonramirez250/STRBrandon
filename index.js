@@ -9,7 +9,7 @@ const itemsPerPage = 5;
 let currentPage = 1;
 let data = [];
 
-// Cargar los datos desde Google Sheets
+// URL de la hoja de Google Sheets
 const sheetUrl = 'https://docs.google.com/spreadsheets/d/1366f1Tta15g3rLA6OQCeZA4P7AXrWK5l/gviz/tq?tqx=out:json';
 
 // Usamos Tabletop.js para acceder a Google Sheets
@@ -40,18 +40,29 @@ function displayData(filteredData) {
     const end = start + itemsPerPage;
     const pageData = filteredData.slice(start, end);
 
-    pageData.forEach(item => {
-      const card = document.createElement('div');
-      card.classList.add('card');
-      card.innerHTML = `
-        <div>
-          <div class="mac">MAC: ${item.mac}</div>
-          <div class="sn">SN: ${item.sn}</div>
-        </div>
-        <div class="activo">Activo: ${item.activo}</div>
-      `;
-      dataContainer.appendChild(card);
+    const table = document.createElement('table');
+    const headerRow = document.createElement('tr');
+    // Crear las cabeceras dinámicamente a partir de las propiedades del primer objeto
+    const headers = Object.keys(pageData[0]);
+    headers.forEach(header => {
+      const th = document.createElement('th');
+      th.textContent = header.toUpperCase();
+      headerRow.appendChild(th);
     });
+    table.appendChild(headerRow);
+
+    // Crear las filas de datos
+    pageData.forEach(item => {
+      const row = document.createElement('tr');
+      headers.forEach(header => {
+        const td = document.createElement('td');
+        td.textContent = item[header] || 'N/A'; // Si la propiedad no existe, muestra "N/A"
+        row.appendChild(td);
+      });
+      table.appendChild(row);
+    });
+
+    dataContainer.appendChild(table);
 
     // Paginación
     const createPageButton = (page, text) => {
@@ -94,11 +105,11 @@ function filterData() {
   const filteredData = data.filter(item => {
     switch (filterBy) {
       case 'mac':
-        return item.mac.toLowerCase().includes(searchValue);
+        return item.mac && item.mac.toLowerCase().includes(searchValue);
       case 'sn':
-        return item.sn.toLowerCase().includes(searchValue);
+        return item.sn && item.sn.toLowerCase().includes(searchValue);
       case 'activo':
-        return item.activo.toLowerCase().includes(searchValue);
+        return item.activo && item.activo.toLowerCase().includes(searchValue);
       default:
         return false;
     }
