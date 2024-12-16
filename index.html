@@ -3,9 +3,9 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Mi Web con GitHub Pages</title>
-  <link rel="stylesheet" href="index.css">
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.17.0/xlsx.full.min.js"></script> <!-- Cargar librería para trabajar con archivos Excel -->
+  <title>Mi Web con Google Sheets</title>
+  <link rel="stylesheet" href="styles.css"> <!-- Vincula el CSS -->
+  <script src="https://cdn.jsdelivr.net/npm/tabletop@1.6.0"></script> <!-- Librería Tabletop.js -->
 </head>
 <body>
   <div class="container">
@@ -18,13 +18,10 @@
         <option value="activo">Activo</option>
       </select>
       <input type="text" id="searchInput" placeholder="Escribe para buscar..." />
-      <br><br>
-      <label for="uploadExcel">Cargar archivo Excel:</label>
-      <input type="file" id="uploadExcel" />
     </header>
 
     <section id="dataContainer">
-      <!-- Los datos cargados desde JSON o Excel se mostrarán aquí -->
+      <!-- Los datos cargados desde Google Sheets se mostrarán aquí -->
     </section>
 
     <div id="pagination" class="pagination">
@@ -32,6 +29,6 @@
     </div>
   </div>
 
-  <script src="index.js"></script>
+  <script src="index.js"></script> <!-- Vincula el archivo JavaScript -->
 </body>
 </html>
