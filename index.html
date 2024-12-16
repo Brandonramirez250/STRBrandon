@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Mi Web con GitHub Pages</title>
+  <link rel="stylesheet" href="index.css">
+</head>
+<body>
+  <div class="container">
+    <header>
+      <h1>Buscar Datos</h1>
+      <label for="searchType">Buscar por:</label>
+      <select id="searchType">
+        <option value="mac">MAC</option>
+        <option value="sn">SN</option>
+        <option value="activo">Activo</option>
+      </select>
+      <input type="text" id="searchInput" placeholder="Escribe para buscar..." />
+    </header>
+
+    <section id="dataContainer">
+      <!-- Los datos cargados desde JSON se mostrarán aquí -->
+    </section>
+
+    <div id="pagination" class="pagination">
+      <!-- Paginación será añadida aquí -->
+    </div>
+  </div>
+
+  <script src="index.js"></script>
+</body>
+</html>
