@@ -7,35 +7,20 @@ const itemsPerPage = 5;
 let currentPage = 1;
 let data = [];
 
-// Tu clave de API y ID de hoja de cálculo
-const API_KEY = 'TU_API_KEY';  // Sustituye con tu API key
-const SPREADSHEET_ID = '1366f1Tta15g3rLA6OQCeZA4P7AXrWK5l';  // Sustituye con el ID de tu hoja de Google Sheets
-const RANGE = 'Hoja1!A:C';  // Ajusta el rango según tus necesidades
-
-// Cargar los datos desde Google Sheets
+// Cargar los datos desde Google Sheets usando Tabletop.js
 function loadDataFromGoogleSheets() {
-  gapi.load('client', initClient);
-}
-
-function initClient() {
-  gapi.client.init({
-    apiKey: API_KEY,
-    discoveryDocs: ['https://sheets.googleapis.com/$discovery/rest?version=v4'],
-  }).then(function() {
-    return gapi.client.sheets.spreadsheets.values.get({
-      spreadsheetId: SPREADSHEET_ID,
-      range: RANGE,
-    });
-  }).then(function(response) {
-    const rows = response.result.values;
-    if (rows.length) {
-      data = rows.slice(1).map(row => ({ mac: row[0], sn: row[1], activo: row[2] })); // Suponiendo que los datos están en las columnas A, B, C
+  Tabletop.init({
+    key: 'https://docs.google.com/spreadsheets/d/1366f1Tta15g3rLA6OQCeZA4P7AXrWK5l/edit?usp=sharing',
+    callback: function(sheetData, tabletop) {
+      // Aquí se transforman los datos de la hoja de cálculo a un formato más útil
+      data = sheetData.map(item => ({
+        mac: item.MAC,
+        sn: item.SN,
+        activo: item.ACTIVO
+      }));
       displayData(data);
-    } else {
-      console.log('No data found.');
-    }
-  }).catch(function(error) {
-    console.error('Error al cargar los datos desde Google Sheets:', error);
+    },
+    simpleSheet: true
   });
 }
 
@@ -55,27 +40,18 @@ function displayData(filteredData) {
     const end = start + itemsPerPage;
     const pageData = filteredData.slice(start, end);
 
-    const table = document.createElement('table');
-    const headerRow = document.createElement('tr');
-    const headers = ['MAC', 'SN', 'ACTIVO'];
-    headers.forEach(header => {
-      const th = document.createElement('th');
-      th.textContent = header;
-      headerRow.appendChild(th);
-    });
-    table.appendChild(headerRow);
-
     pageData.forEach(item => {
-      const row = document.createElement('tr');
-      headers.forEach(header => {
-        const td = document.createElement('td');
-        td.textContent = item[header.toLowerCase()] || 'N/A';
-        row.appendChild(td);
-      });
-      table.appendChild(row);
-    });
+      const card = document.createElement('div');
+      card.classList.add('card');
 
-    dataContainer.appendChild(table);
+      card.innerHTML = `
+        <div class="mac">MAC: ${item.mac}</div>
+        <div class="sn">SN: ${item.sn}</div>
+        <div class="activo">Activo: ${item.activo}</div>
+      `;
+
+      dataContainer.appendChild(card);
+    });
 
     const createPageButton = (page, text) => {
       const button = document.createElement('button');
