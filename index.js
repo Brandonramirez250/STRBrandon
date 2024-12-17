@@ -7,28 +7,40 @@ const itemsPerPage = 5;
 let currentPage = 1;
 let data = [];
 
-// URL de la hoja de Google Sheets (reemplazar con el enlace correcto)
-const sheetUrl = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vQskhSjiJ4H1yJl7G9AtQDhgFxu8ByFHxIQFA/pub?output=csv';  // Asegúrate de usar la URL publicada
+// Tu clave de API y ID de hoja de cálculo
+const API_KEY = 'TU_API_KEY';  // Sustituye con tu API key
+const SPREADSHEET_ID = '1366f1Tta15g3rLA6OQCeZA4P7AXrWK5l';  // Sustituye con el ID de tu hoja de Google Sheets
+const RANGE = 'Hoja1!A:C';  // Ajusta el rango según tus necesidades
 
-// Usamos Tabletop.js para acceder a Google Sheets
-window.onload = function() {
-  Tabletop.init({
-    key: '1366f1Tta15g3rLA6OQCeZA4P7AXrWK5l',  // Reemplaza con tu `key`
-    simpleSheet: true,
-    callback: function(response) {
-      console.log("Datos cargados desde Google Sheets:", response);
-      data = response; // Almacenamos los datos de la hoja en la variable 'data'
-      displayData(data); // Muestra los datos en la página
-    },
-    error: function(error) {
-      console.log("Error al cargar los datos:", error);
+// Cargar los datos desde Google Sheets
+function loadDataFromGoogleSheets() {
+  gapi.load('client', initClient);
+}
+
+function initClient() {
+  gapi.client.init({
+    apiKey: API_KEY,
+    discoveryDocs: ['https://sheets.googleapis.com/$discovery/rest?version=v4'],
+  }).then(function() {
+    return gapi.client.sheets.spreadsheets.values.get({
+      spreadsheetId: SPREADSHEET_ID,
+      range: RANGE,
+    });
+  }).then(function(response) {
+    const rows = response.result.values;
+    if (rows.length) {
+      data = rows.slice(1).map(row => ({ mac: row[0], sn: row[1], activo: row[2] })); // Suponiendo que los datos están en las columnas A, B, C
+      displayData(data);
+    } else {
+      console.log('No data found.');
     }
+  }).catch(function(error) {
+    console.error('Error al cargar los datos desde Google Sheets:', error);
   });
-};
+}
 
-// Función para mostrar los datos en la página
+// Mostrar los datos en la página
 function displayData(filteredData) {
-  console.log("Datos filtrados para mostrar:", filteredData);
   dataContainer.innerHTML = '';
   paginationContainer.innerHTML = '';
 
@@ -45,10 +57,10 @@ function displayData(filteredData) {
 
     const table = document.createElement('table');
     const headerRow = document.createElement('tr');
-    const headers = Object.keys(pageData[0]);
+    const headers = ['MAC', 'SN', 'ACTIVO'];
     headers.forEach(header => {
       const th = document.createElement('th');
-      th.textContent = header.toUpperCase();
+      th.textContent = header;
       headerRow.appendChild(th);
     });
     table.appendChild(headerRow);
@@ -57,7 +69,7 @@ function displayData(filteredData) {
       const row = document.createElement('tr');
       headers.forEach(header => {
         const td = document.createElement('td');
-        td.textContent = item[header] || 'N/A';
+        td.textContent = item[header.toLowerCase()] || 'N/A';
         row.appendChild(td);
       });
       table.appendChild(row);
@@ -87,11 +99,13 @@ function displayData(filteredData) {
   }
 }
 
+// Cambiar página
 function changePage(page) {
   currentPage = page;
   displayData(data);
 }
 
+// Filtrar datos
 searchInput.addEventListener('input', filterData);
 searchType.addEventListener('change', filterData);
 
@@ -114,3 +128,6 @@ function filterData() {
 
   displayData(filteredData);
 }
+
+// Cargar los datos desde Google Sheets cuando la página esté lista
+window.onload = loadDataFromGoogleSheets;
