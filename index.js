@@ -1,21 +1,19 @@
-// Referencia a los elementos de la página
 const searchInput = document.getElementById("searchInput");
 const dataContainer = document.getElementById("dataContainer");
 const searchType = document.getElementById("searchType");
 const paginationContainer = document.getElementById("pagination");
 
-// Tamaño de página y página actual
 const itemsPerPage = 5;
 let currentPage = 1;
 let data = [];
 
-// URL de la hoja de Google Sheets (asegúrate de que sea pública)
-const sheetUrl = 'https://docs.google.com/spreadsheets/d/1366f1Tta15g3rLA6OQCeZA4P7AXrWK5l/gviz/tq?tqx=out:json';
+// URL de la hoja de Google Sheets (reemplazar con el enlace correcto)
+const sheetUrl = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vQskhSjiJ4H1yJl7G9AtQDhgFxu8ByFHxIQFA/pub?output=csv';  // Asegúrate de usar la URL publicada
 
 // Usamos Tabletop.js para acceder a Google Sheets
 window.onload = function() {
   Tabletop.init({
-    key: sheetUrl,
+    key: '1366f1Tta15g3rLA6OQCeZA4P7AXrWK5l',  // Reemplaza con tu `key`
     simpleSheet: true,
     callback: function(response) {
       console.log("Datos cargados desde Google Sheets:", response);
@@ -47,7 +45,6 @@ function displayData(filteredData) {
 
     const table = document.createElement('table');
     const headerRow = document.createElement('tr');
-    // Crear las cabeceras dinámicamente a partir de las propiedades del primer objeto
     const headers = Object.keys(pageData[0]);
     headers.forEach(header => {
       const th = document.createElement('th');
@@ -56,12 +53,11 @@ function displayData(filteredData) {
     });
     table.appendChild(headerRow);
 
-    // Crear las filas de datos
     pageData.forEach(item => {
       const row = document.createElement('tr');
       headers.forEach(header => {
         const td = document.createElement('td');
-        td.textContent = item[header] || 'N/A'; // Si la propiedad no existe, muestra "N/A"
+        td.textContent = item[header] || 'N/A';
         row.appendChild(td);
       });
       table.appendChild(row);
@@ -69,7 +65,6 @@ function displayData(filteredData) {
 
     dataContainer.appendChild(table);
 
-    // Paginación
     const createPageButton = (page, text) => {
       const button = document.createElement('button');
       button.textContent = text;
@@ -92,17 +87,14 @@ function displayData(filteredData) {
   }
 }
 
-// Función para cambiar de página
 function changePage(page) {
   currentPage = page;
   displayData(data);
 }
 
-// Función para filtrar los datos por búsqueda
 searchInput.addEventListener('input', filterData);
 searchType.addEventListener('change', filterData);
 
-// Función de filtro
 function filterData() {
   const searchValue = searchInput.value.toLowerCase();
   const filterBy = searchType.value;
