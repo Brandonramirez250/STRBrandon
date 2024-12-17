@@ -9,7 +9,7 @@ const itemsPerPage = 5;
 let currentPage = 1;
 let data = [];
 
-// URL de la hoja de Google Sheets
+// URL de la hoja de Google Sheets (asegúrate de que sea pública)
 const sheetUrl = 'https://docs.google.com/spreadsheets/d/1366f1Tta15g3rLA6OQCeZA4P7AXrWK5l/gviz/tq?tqx=out:json';
 
 // Usamos Tabletop.js para acceder a Google Sheets
@@ -18,14 +18,19 @@ window.onload = function() {
     key: sheetUrl,
     simpleSheet: true,
     callback: function(response) {
+      console.log("Datos cargados desde Google Sheets:", response);
       data = response; // Almacenamos los datos de la hoja en la variable 'data'
       displayData(data); // Muestra los datos en la página
+    },
+    error: function(error) {
+      console.log("Error al cargar los datos:", error);
     }
   });
 };
 
 // Función para mostrar los datos en la página
 function displayData(filteredData) {
+  console.log("Datos filtrados para mostrar:", filteredData);
   dataContainer.innerHTML = '';
   paginationContainer.innerHTML = '';
 
