@@ -7,21 +7,15 @@ const itemsPerPage = 5;
 let currentPage = 1;
 let data = [];
 
-// Cargar los datos desde Google Sheets usando Tabletop.js
-function loadDataFromGoogleSheets() {
-  Tabletop.init({
-    key: 'https://docs.google.com/spreadsheets/d/1366f1Tta15g3rLA6OQCeZA4P7AXrWK5l/edit?usp=sharing',
-    callback: function(sheetData, tabletop) {
-      // Aquí se transforman los datos de la hoja de cálculo a un formato más útil
-      data = sheetData.map(item => ({
-        mac: item.MAC,
-        sn: item.SN,
-        activo: item.ACTIVO
-      }));
+// Cargar datos desde el archivo JSON usando fetch
+function loadData() {
+  fetch('TVBOX1.JSON')
+    .then(response => response.json())
+    .then(jsonData => {
+      data = jsonData;
       displayData(data);
-    },
-    simpleSheet: true
-  });
+    })
+    .catch(error => console.error('Error al cargar los datos:', error));
 }
 
 // Mostrar los datos en la página
@@ -45,9 +39,9 @@ function displayData(filteredData) {
       card.classList.add('card');
 
       card.innerHTML = `
-        <div class="mac">MAC: ${item.mac}</div>
-        <div class="sn">SN: ${item.sn}</div>
-        <div class="activo">Activo: ${item.activo}</div>
+        <div class="mac">MAC: ${item.MAC}</div>
+        <div class="sn">SN: ${item.SN}</div>
+        <div class="activo">Activo: ${item.ACTIVO}</div>
       `;
 
       dataContainer.appendChild(card);
@@ -92,11 +86,11 @@ function filterData() {
   const filteredData = data.filter(item => {
     switch (filterBy) {
       case 'mac':
-        return item.mac && item.mac.toLowerCase().includes(searchValue);
+        return item.MAC && item.MAC.toLowerCase().includes(searchValue);
       case 'sn':
-        return item.sn && item.sn.toLowerCase().includes(searchValue);
+        return item.SN && item.SN.toLowerCase().includes(searchValue);
       case 'activo':
-        return item.activo && item.activo.toLowerCase().includes(searchValue);
+        return item.ACTIVO && item.ACTIVO.toLowerCase().includes(searchValue);
       default:
         return false;
     }
@@ -105,5 +99,5 @@ function filterData() {
   displayData(filteredData);
 }
 
-// Cargar los datos desde Google Sheets cuando la página esté lista
-window.onload = loadDataFromGoogleSheets;
+// Cargar los datos desde el archivo JSON cuando la página esté lista
+window.onload = loadData;
