@@ -1,20 +1,20 @@
 let data = []; // Datos cargados desde los archivos JSON
 let filteredData = []; // Datos filtrados (según la búsqueda)
 let currentPage = 1; // Página actual
-const resultsPerPage = 6; // Número de resultados por página (cambiado a 6)
+const resultsPerPage = 6; // Número de resultados por página
 
 // Cargar datos desde los ocho archivos JSON
 async function loadData() {
   try {
     const [response1, response2, response3, response4, response5, response6, response7, response8] = await Promise.all([
-      fetch('TVBOX1.json'), // Ruta de TVBOX1.json
-      fetch('TVBOX2.json'), // Ruta de TVBOX2.json
-      fetch('TVBOX3.json'), // Ruta de TVBOX3.json
-      fetch('TVBOX4.json'), // Ruta de TVBOX4.json
-      fetch('TVBOX5.json'), // Ruta de TVBOX5.json
-      fetch('TVBOX6.json'), // Ruta de TVBOX6.json
-      fetch('TVBOX7.json'), // Ruta de TVBOX7.json
-      fetch('TVBOX8.json')  // Ruta de TVBOX8.json (nuevo archivo agregado)
+      fetch('TVBOX1.json'),
+      fetch('TVBOX2.json'),
+      fetch('TVBOX3.json'),
+      fetch('TVBOX4.json'),
+      fetch('TVBOX5.json'),
+      fetch('TVBOX6.json'),
+      fetch('TVBOX7.json'),
+      fetch('TVBOX8.json')
     ]);
 
     if (!response1.ok || !response2.ok || !response3.ok || !response4.ok || !response5.ok || !response6.ok || !response7.ok || !response8.ok) {
@@ -28,12 +28,12 @@ async function loadData() {
     const data5 = await response5.json();
     const data6 = await response6.json();
     const data7 = await response7.json();
-    const data8 = await response8.json(); // Cargar datos del nuevo archivo
+    const data8 = await response8.json();
 
-    // Combinamos los ocho conjuntos de datos
+    // Combinamos todos los conjuntos de datos
     const allData = [...data1, ...data2, ...data3, ...data4, ...data5, ...data6, ...data7, ...data8];
 
-    // Validar el campo 'activo' para cada elemento
+    // Aseguramos que todos los elementos tengan el campo 'ACTIVO'
     data = allData.map(item => {
       if (!item.ACTIVO) {
         item.ACTIVO = 'No tiene';  // Asignamos 'No tiene' si no existe el campo 'ACTIVO'
@@ -41,9 +41,11 @@ async function loadData() {
       return item;
     });
 
-    filteredData = [...data]; // Inicialmente, los datos filtrados son todos
-    console.log('Datos cargados:', data); // Verifica en la consola si los datos se cargan correctamente
-    renderData(); // Renderizar los datos con paginación
+    // Inicializamos los datos filtrados con todos los datos
+    filteredData = [...data];
+
+    console.log('Datos cargados:', data); // Verifica que los datos se cargan correctamente
+    renderData(); // Renderizamos los datos con paginación
   } catch (error) {
     console.error('Error al cargar los datos:', error);
     alert('Hubo un error al cargar los datos, por favor intentalo de nuevo más tarde.');
@@ -88,13 +90,13 @@ function renderPagination() {
 
   const totalPages = Math.ceil(filteredData.length / resultsPerPage); // Calcular total de páginas
 
-  // Si hay menos de 2 páginas, no mostrar botones de "Primero", "Anterior", "Siguiente" y "Último"
+  // Si no hay páginas, no se muestra nada
   if (totalPages <= 1) return;
 
   // Botón "Primero"
   const firstButton = document.createElement('button');
   firstButton.textContent = 'Primero';
-  firstButton.classList.add('nav-button', currentPage === 1 ? 'disabled' : '');
+  if (currentPage === 1) firstButton.classList.add('disabled');
   firstButton.addEventListener('click', () => {
     currentPage = 1;
     renderData();
@@ -104,19 +106,19 @@ function renderPagination() {
   // Botón "Anterior"
   const prevButton = document.createElement('button');
   prevButton.textContent = 'Anterior';
-  prevButton.classList.add('nav-button', currentPage === 1 ? 'disabled' : '');
+  if (currentPage === 1) prevButton.classList.add('disabled');
   prevButton.addEventListener('click', () => {
     if (currentPage > 1) currentPage--;
     renderData();
   });
   paginationContainer.appendChild(prevButton);
 
-  // Mostrar un rango de botones de página (de 5 a 7 botones)
+  // Botones de las páginas
   const pageButtonRange = getPageButtonRange(currentPage, totalPages);
   for (let i = pageButtonRange.start; i <= pageButtonRange.end; i++) {
     const pageButton = document.createElement('button');
     pageButton.textContent = i;
-    pageButton.classList.add(i === currentPage ? 'active' : '');
+    if (i === currentPage) pageButton.classList.add('active');
     pageButton.addEventListener('click', () => {
       currentPage = i;
       renderData();
@@ -127,7 +129,7 @@ function renderPagination() {
   // Botón "Siguiente"
   const nextButton = document.createElement('button');
   nextButton.textContent = 'Siguiente';
-  nextButton.classList.add('nav-button', currentPage === totalPages ? 'disabled' : '');
+  if (currentPage === totalPages) nextButton.classList.add('disabled');
   nextButton.addEventListener('click', () => {
     if (currentPage < totalPages) currentPage++;
     renderData();
@@ -137,7 +139,7 @@ function renderPagination() {
   // Botón "Último"
   const lastButton = document.createElement('button');
   lastButton.textContent = 'Último';
-  lastButton.classList.add('nav-button', currentPage === totalPages ? 'disabled' : '');
+  if (currentPage === totalPages) lastButton.classList.add('disabled');
   lastButton.addEventListener('click', () => {
     currentPage = totalPages;
     renderData();
@@ -145,7 +147,7 @@ function renderPagination() {
   paginationContainer.appendChild(lastButton);
 }
 
-// Función para calcular el rango de botones de la paginación (con más botones intermedios)
+// Función para calcular el rango de botones de la paginación
 function getPageButtonRange(currentPage, totalPages) {
   let start = currentPage - 2;
   let end = currentPage + 2;
@@ -153,15 +155,6 @@ function getPageButtonRange(currentPage, totalPages) {
   // Evitar que los botones de página se salgan de los límites
   if (start < 1) start = 1;
   if (end > totalPages) end = totalPages;
-
-  // Mostrar entre 5 a 7 botones de página
-  if (totalPages > 7) {
-    if (currentPage <= 3) {
-      end = 5;  // Si estamos al principio, mostrar las primeras 5 páginas
-    } else if (currentPage >= totalPages - 2) {
-      start = totalPages - 4; // Si estamos cerca del final, mostrar las últimas 5 páginas
-    }
-  }
 
   return { start, end };
 }
