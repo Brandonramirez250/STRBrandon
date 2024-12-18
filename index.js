@@ -9,7 +9,7 @@ let data = [];
 
 // Cargar datos desde el archivo JSON usando fetch
 function loadData() {
-  fetch('TVBOX1.JSON')
+  fetch('TVBOX1.json')
     .then(response => response.json())
     .then(jsonData => {
       data = jsonData;
