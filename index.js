@@ -1,7 +1,7 @@
 let data = []; // Datos cargados desde los archivos JSON
 let filteredData = []; // Datos filtrados (según la búsqueda)
 let currentPage = 1; // Página actual
-const resultsPerPage = 10; // Número de resultados por página
+const resultsPerPage = 6; // Número de resultados por página (cambiado a 6)
 
 // Cargar datos desde los ocho archivos JSON
 async function loadData() {
@@ -111,7 +111,7 @@ function renderPagination() {
   });
   paginationContainer.appendChild(prevButton);
 
-  // Botones de las páginas (Mostrar entre 5 y 7 botones de página por vez)
+  // Mostrar un rango de botones de página (de 5 a 7 botones)
   const pageButtonRange = getPageButtonRange(currentPage, totalPages);
   for (let i = pageButtonRange.start; i <= pageButtonRange.end; i++) {
     const pageButton = document.createElement('button');
@@ -145,7 +145,7 @@ function renderPagination() {
   paginationContainer.appendChild(lastButton);
 }
 
-// Función para calcular el rango de botones de la paginación
+// Función para calcular el rango de botones de la paginación (con más botones intermedios)
 function getPageButtonRange(currentPage, totalPages) {
   let start = currentPage - 2;
   let end = currentPage + 2;
@@ -153,6 +153,15 @@ function getPageButtonRange(currentPage, totalPages) {
   // Evitar que los botones de página se salgan de los límites
   if (start < 1) start = 1;
   if (end > totalPages) end = totalPages;
+
+  // Mostrar entre 5 a 7 botones de página
+  if (totalPages > 7) {
+    if (currentPage <= 3) {
+      end = 5;  // Si estamos al principio, mostrar las primeras 5 páginas
+    } else if (currentPage >= totalPages - 2) {
+      start = totalPages - 4; // Si estamos cerca del final, mostrar las últimas 5 páginas
+    }
+  }
 
   return { start, end };
 }
