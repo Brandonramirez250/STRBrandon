@@ -14,6 +14,7 @@
       <select id="searchType">
         <option value="mac">MAC</option>
         <option value="sn">SN</option>
+        <option value="activo">Activo</option>
       </select>
       <input type="text" id="searchInput" placeholder="Escribe para buscar..." />
     </header>
@@ -24,6 +25,10 @@
 
     <div id="pagination" class="pagination">
       <!-- Paginación será añadida aquí -->
+    </div>
+
+    <div id="noResults" class="no-results" style="display:none;">
+      <p>No se encontraron resultados.</p>
     </div>
   </div>
 

@@ -1,18 +1,44 @@
-let data = []; // Datos cargados desde el archivo JSON
+let data = []; // Datos cargados desde los archivos JSON
 let filteredData = []; // Datos filtrados (según la búsqueda)
 let currentPage = 1; // Página actual
 const resultsPerPage = 10; // Número de resultados por página
 
-// Cargar datos desde el archivo JSON
+// Cargar datos desde los seis archivos JSON
 async function loadData() {
   try {
-    const response = await fetch('TVBOX1.json'); // Asegúrate de tener el archivo JSON en la ruta correcta
-    if (!response.ok) {
-      throw new Error('No se pudo cargar el archivo JSON');
+    const [response1, response2, response3, response4, response5, response6] = await Promise.all([
+      fetch('TVBOX1.json'), // Ruta de TVBOX1.json
+      fetch('TVBOX2.json'), // Ruta de TVBOX2.json
+      fetch('TVBOX3.json'), // Ruta de TVBOX3.json
+      fetch('TVBOX4.json'), // Ruta de TVBOX4.json
+      fetch('TVBOX5.json'), // Ruta de TVBOX5.json
+      fetch('TVBOX6.json')  // Ruta de TVBOX6.json (nuevo archivo agregado)
+    ]);
+
+    if (!response1.ok || !response2.ok || !response3.ok || !response4.ok || !response5.ok || !response6.ok) {
+      throw new Error('No se pudieron cargar los archivos JSON');
     }
-    data = await response.json();
+
+    const data1 = await response1.json();
+    const data2 = await response2.json();
+    const data3 = await response3.json();
+    const data4 = await response4.json();
+    const data5 = await response5.json();
+    const data6 = await response6.json(); // Cargar datos del nuevo archivo
+
+    // Combinamos los seis conjuntos de datos
+    const allData = [...data1, ...data2, ...data3, ...data4, ...data5, ...data6];
+
+    // Validar el campo 'activo' para cada elemento
+    data = allData.map(item => {
+      if (!item.ACTIVO) {
+        item.ACTIVO = 'No tiene';  // Asignamos 'No tiene' si no existe el campo 'ACTIVO'
+      }
+      return item;
+    });
+
     filteredData = [...data]; // Inicialmente, los datos filtrados son todos
-    console.log('Datos cargados:', data);  // Verifica en la consola si los datos se cargan correctamente
+    console.log('Datos cargados:', data); // Verifica en la consola si los datos se cargan correctamente
     renderData(); // Renderizar los datos con paginación
   } catch (error) {
     console.error('Error al cargar los datos:', error);
@@ -23,7 +49,9 @@ async function loadData() {
 // Función para mostrar los datos en la interfaz
 function renderData() {
   const dataContainer = document.getElementById('dataContainer');
+  const noResults = document.getElementById('noResults');
   dataContainer.innerHTML = ''; // Limpiar el contenedor antes de mostrar nuevos resultados
+  noResults.style.display = 'none'; // Ocultar el mensaje de "No resultados"
 
   // Calcular el rango de resultados a mostrar
   const start = (currentPage - 1) * resultsPerPage;
@@ -32,7 +60,7 @@ function renderData() {
 
   // Mostrar los datos actuales
   if (currentData.length === 0) {
-    dataContainer.innerHTML = '<p>No se encontraron resultados</p>';
+    noResults.style.display = 'block'; // Mostrar mensaje de "No resultados"
   } else {
     currentData.forEach(item => {
       const card = document.createElement('div');
@@ -40,6 +68,7 @@ function renderData() {
       card.innerHTML = `
         <p><strong>SN:</strong> ${item.SN}</p>
         <p><strong>MAC:</strong> ${item.MAC}</p>
+        <p><strong>ACTIVO:</strong> ${item.ACTIVO}</p>
       `;
       dataContainer.appendChild(card);
     });
@@ -56,7 +85,7 @@ function renderPagination() {
   const totalPages = Math.ceil(filteredData.length / resultsPerPage); // Calcular total de páginas
 
   // Si hay menos de 2 páginas, no mostrar botones de "Primero", "Anterior", "Siguiente" y "Último"
-  if (totalPages <= 1) return; 
+  if (totalPages <= 1) return;
 
   // Botón "Primero"
   const firstButton = document.createElement('button');
@@ -133,8 +162,18 @@ function searchData() {
   filteredData = data.filter(item => {
     if (searchType === 'mac' && item.MAC.toLowerCase().includes(searchInput)) return true;
     if (searchType === 'sn' && item.SN.toLowerCase().includes(searchInput)) return true;
+    if (searchType === 'activo' && item.ACTIVO.toLowerCase().includes(searchInput)) return true;
     return false;
   });
+
+  // Si no se encuentra "activo", mostrar "No tiene"
+  if (filteredData.length === 0) {
+    const noResults = document.getElementById('noResults');
+    noResults.style.display = 'block';
+    noResults.innerText = 'No se encontraron resultados para ese término.';
+  } else {
+    document.getElementById('noResults').style.display = 'none';
+  }
 
   currentPage = 1; // Resetear a la primera página
   renderData(); // Actualizar la vista con los datos filtrados
