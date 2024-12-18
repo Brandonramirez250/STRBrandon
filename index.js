@@ -1,32 +1,22 @@
-let data = []; // Datos cargados desde los dos archivos JSON
+let data = []; // Datos cargados desde el archivo JSON
 let filteredData = []; // Datos filtrados (según la búsqueda)
 let currentPage = 1; // Página actual
 const resultsPerPage = 10; // Número de resultados por página
 
-// Cargar datos desde los archivos JSON
-async function loadDataFromJSON() {
+// Cargar datos desde el archivo JSON
+async function loadData() {
   try {
-    // Cargar TVBOX1.json
-    const response1 = await fetch('TVBOX1.json');
-    if (!response1.ok) {
-      throw new Error('No se pudo cargar el archivo TVBOX1.json');
+    const response = await fetch('TVBOX1.json'); // Asegúrate de tener el archivo JSON en la ruta correcta
+    if (!response.ok) {
+      throw new Error('No se pudo cargar el archivo JSON');
     }
-    const jsonData1 = await response1.json();
-
-    // Cargar TVBOX2.json
-    const response2 = await fetch('TVBOX2.json');
-    if (!response2.ok) {
-      throw new Error('No se pudo cargar el archivo TVBOX2.json');
-    }
-    const jsonData2 = await response2.json();
-
-    // Combinar ambos archivos JSON
-    data = [...jsonData1, ...jsonData2];
-    filteredData = [...data];
-    renderData();
+    data = await response.json();
+    filteredData = [...data]; // Inicialmente, los datos filtrados son todos
+    console.log('Datos cargados:', data);  // Verifica en la consola si los datos se cargan correctamente
+    renderData(); // Renderizar los datos con paginación
   } catch (error) {
-    console.error('Error al cargar los datos JSON:', error);
-    alert('Hubo un error al cargar los datos JSON, por favor intentalo de nuevo más tarde.');
+    console.error('Error al cargar los datos:', error);
+    alert('Hubo un error al cargar los datos, por favor intentalo de nuevo más tarde.');
   }
 }
 
@@ -38,7 +28,7 @@ function renderData() {
   // Calcular el rango de resultados a mostrar
   const start = (currentPage - 1) * resultsPerPage;
   const end = start + resultsPerPage;
-  const currentData = filteredData.slice(start, end);
+  const currentData = filteredData.slice(start, end); // Slice para obtener los datos de la página actual
 
   // Mostrar los datos actuales
   if (currentData.length === 0) {
@@ -65,6 +55,9 @@ function renderPagination() {
 
   const totalPages = Math.ceil(filteredData.length / resultsPerPage); // Calcular total de páginas
 
+  // Si hay menos de 2 páginas, no mostrar botones de "Primero", "Anterior", "Siguiente" y "Último"
+  if (totalPages <= 1) return; 
+
   // Botón "Primero"
   const firstButton = document.createElement('button');
   firstButton.textContent = 'Primero';
@@ -85,8 +78,9 @@ function renderPagination() {
   });
   paginationContainer.appendChild(prevButton);
 
-  // Botones de las páginas
-  for (let i = 1; i <= totalPages; i++) {
+  // Botones de las páginas (Mostrar entre 5 y 7 botones de página por vez)
+  const pageButtonRange = getPageButtonRange(currentPage, totalPages);
+  for (let i = pageButtonRange.start; i <= pageButtonRange.end; i++) {
     const pageButton = document.createElement('button');
     pageButton.textContent = i;
     pageButton.classList.add(i === currentPage ? 'active' : '');
@@ -118,11 +112,24 @@ function renderPagination() {
   paginationContainer.appendChild(lastButton);
 }
 
+// Función para calcular el rango de botones de la paginación
+function getPageButtonRange(currentPage, totalPages) {
+  let start = currentPage - 2;
+  let end = currentPage + 2;
+
+  // Evitar que los botones de página se salgan de los límites
+  if (start < 1) start = 1;
+  if (end > totalPages) end = totalPages;
+
+  return { start, end };
+}
+
 // Función de búsqueda
 function searchData() {
   const searchType = document.getElementById('searchType').value;
   const searchInput = document.getElementById('searchInput').value.toLowerCase();
 
+  // Filtrar los datos basados en el tipo de búsqueda y el texto ingresado
   filteredData = data.filter(item => {
     if (searchType === 'mac' && item.MAC.toLowerCase().includes(searchInput)) return true;
     if (searchType === 'sn' && item.SN.toLowerCase().includes(searchInput)) return true;
@@ -138,4 +145,4 @@ document.getElementById('searchInput').addEventListener('input', searchData);
 document.getElementById('searchType').addEventListener('change', searchData);
 
 // Cargar los datos al inicio
-loadDataFromJSON();
+loadData();
