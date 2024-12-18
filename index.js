@@ -3,19 +3,21 @@ let filteredData = []; // Datos filtrados (según la búsqueda)
 let currentPage = 1; // Página actual
 const resultsPerPage = 10; // Número de resultados por página
 
-// Cargar datos desde los seis archivos JSON
+// Cargar datos desde los ocho archivos JSON
 async function loadData() {
   try {
-    const [response1, response2, response3, response4, response5, response6] = await Promise.all([
+    const [response1, response2, response3, response4, response5, response6, response7, response8] = await Promise.all([
       fetch('TVBOX1.json'), // Ruta de TVBOX1.json
       fetch('TVBOX2.json'), // Ruta de TVBOX2.json
       fetch('TVBOX3.json'), // Ruta de TVBOX3.json
       fetch('TVBOX4.json'), // Ruta de TVBOX4.json
       fetch('TVBOX5.json'), // Ruta de TVBOX5.json
-      fetch('TVBOX6.json')  // Ruta de TVBOX6.json (nuevo archivo agregado)
+      fetch('TVBOX6.json'), // Ruta de TVBOX6.json
+      fetch('TVBOX7.json'), // Ruta de TVBOX7.json
+      fetch('TVBOX8.json')  // Ruta de TVBOX8.json (nuevo archivo agregado)
     ]);
 
-    if (!response1.ok || !response2.ok || !response3.ok || !response4.ok || !response5.ok || !response6.ok) {
+    if (!response1.ok || !response2.ok || !response3.ok || !response4.ok || !response5.ok || !response6.ok || !response7.ok || !response8.ok) {
       throw new Error('No se pudieron cargar los archivos JSON');
     }
 
@@ -24,10 +26,12 @@ async function loadData() {
     const data3 = await response3.json();
     const data4 = await response4.json();
     const data5 = await response5.json();
-    const data6 = await response6.json(); // Cargar datos del nuevo archivo
+    const data6 = await response6.json();
+    const data7 = await response7.json();
+    const data8 = await response8.json(); // Cargar datos del nuevo archivo
 
-    // Combinamos los seis conjuntos de datos
-    const allData = [...data1, ...data2, ...data3, ...data4, ...data5, ...data6];
+    // Combinamos los ocho conjuntos de datos
+    const allData = [...data1, ...data2, ...data3, ...data4, ...data5, ...data6, ...data7, ...data8];
 
     // Validar el campo 'activo' para cada elemento
     data = allData.map(item => {
